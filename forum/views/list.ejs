@@ -9,24 +9,19 @@
 </head>
 
 <body class="grey-bg ">
-    <div class="white-bg">
-        <div class="list-box">
-            <h4>
-                <%= posts[0].title %>
-            </h4>
-            <p>
-                <%= posts[0].content %>
-            </p>
+    <%- include('nav.ejs') %>
+        <div class="white-bg">
+            <% for (i=0; i < posts.length; i++) {%>
+                <div class="list-box">
+                    <h4>
+                        <%= posts[i].title %>
+                    </h4>
+                    <p>
+                        <%= posts[i].content %>
+                    </p>
+                </div>
+                <% } %>
         </div>
-        <div class="list-box">
-            <h4>
-                <%= posts[1].title %>
-            </h4>
-            <p>
-                <%= posts[1].content %>
-            </p>
-        </div>
-    </div>
 </body>
 
 </html>
