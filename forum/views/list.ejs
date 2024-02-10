@@ -14,7 +14,9 @@
             <% for (i=0; i < posts.length; i++) {%>
                 <div class="list-box">
                     <h4>
-                        <%= posts[i].title %>
+                        <a href="/detail/<%= posts[i]._id %>">
+                            <%= posts[i].title %>
+                        </a>
                     </h4>
                     <p>
                         <%= posts[i].content %>

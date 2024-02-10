@@ -7,7 +7,7 @@ const app = express()
 app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
 
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -55,4 +55,10 @@ app.post('/add', async (요청, 응답) => {
     console.log(e)
     응답.status(500).send('서버에러남')
   }
+})
+
+app.get('/detail/:id', async (요청, 응답) => {
+  let result = await db.collection('post').findOne({_id: new ObjectId(요청.params.id)})
+  console.log(result)
+  응답.render('detail.ejs', {data: result})
 })
