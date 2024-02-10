@@ -9,6 +9,9 @@ app.set('view engine', 'ejs')
 
 const { MongoClient } = require('mongodb')
 
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+
 let db;
 const url = MONGODB_URI
 new MongoClient(url).connect().then((client)=>{
@@ -33,4 +36,15 @@ app.get('/list', async (요청, 응답) => {
 
 app.get('/time', async (요청, 응답) => {
     응답.render('time.ejs', {time: new Date()})
+})
+
+app.get('/write', async (요청, 응답) => {
+  응답.render('write.ejs')
+})
+
+app.post('/add', async (요청, 응답) => {
+  console.log(요청.body)
+  db.collection('post').insertOne(요청.body, () => {
+    console.log(전송완료);
+  })
 })
