@@ -58,7 +58,15 @@ app.post('/add', async (요청, 응답) => {
 })
 
 app.get('/detail/:id', async (요청, 응답) => {
-  let result = await db.collection('post').findOne({_id: new ObjectId(요청.params.id)})
-  console.log(result)
-  응답.render('detail.ejs', {data: result})
+  try {
+    let result = await db.collection('post').findOne({_id: new ObjectId(요청.params.id)})
+    if (result == null) {
+      응답.status(404).send('게시물이 존재하지 않음')
+    } else {
+      응답.render('detail.ejs', {data: result})
+    }
+  } catch (e) {
+    console.log(e)
+    응답.status(400).send('이상한 거 넣지마세요')
+  }  
 })
