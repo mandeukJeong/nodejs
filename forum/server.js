@@ -44,7 +44,15 @@ app.get('/write', async (요청, 응답) => {
 
 app.post('/add', async (요청, 응답) => {
   console.log(요청.body)
-  db.collection('post').insertOne(요청.body, () => {
-    console.log(전송완료);
-  })
+  try {
+    if (요청.body.title == "") {
+      응답.send('제목 입력 안했는데')
+    } else {
+      await db.collection('post').insertOne({title: 요청.body.title, content: 요청.body.content})
+      응답.redirect('/list')
+    }
+  } catch(e) {
+    console.log(e)
+    응답.status(500).send('서버에러남')
+  }
 })
