@@ -70,3 +70,29 @@ app.get('/detail/:id', async (요청, 응답) => {
     응답.status(400).send('이상한 거 넣지마세요')
   }  
 })
+
+app.get('/edit/:id', async (요청, 응답) => {
+  try {
+    let result = await db.collection('post').findOne({_id: new ObjectId(요청.params.id)})
+    if (result == null) {
+      응답.status(404).send('게시물이 존재하지 않음')
+    } else {
+      응답.render('edit.ejs', {result: result})
+    }
+  } catch(e) {
+    console.log(e)
+  }
+})
+
+app.post('/edit/:id', async (요청, 응답) => {
+  try {
+    if (요청.body.title == "" || 요청.body.content == "") {
+      응답.send("빈칸이 있습니다.")
+    } else {
+      await db.collection('post').updateOne({_id: new ObjectId(요청.params.id)}, {$set: {title: 요청.body.title, content: 요청.body.content}})
+      응답.redirect('/list')
+    }
+  } catch(e) {
+    console.log(e)
+  }
+})
