@@ -96,10 +96,7 @@ app.put('/edit/:id', async (요청, 응답) => {
   }
 })
 
-app.delete('/list/:id', async (요청, 응답) => {
-  try {
-    await db.collection('post').deleteOne({_id: new ObjectId(요청.params.id)})
-  } catch(e) {
-    console.log(e)
-  }
+app.delete('/delete', async (요청, 응답) => {
+  await db.collection('post').deleteOne({_id: new ObjectId(요청.query.docid)})
+  응답.send('삭제완료')
 })
