@@ -19,7 +19,8 @@ app.use(passport.initialize())
 app.use(session({
   secret: '암호화에 쓸 비번',
   resave : false,
-  saveUninitialized : false
+  saveUninitialized : false,
+  cookie: { maxAge: 60 * 60 * 1000}
 }))
 
 app.use(passport.session()) 
@@ -135,7 +136,22 @@ passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) =
   }
 }))
 
+passport.serializeUser((user, done) => {
+  process.nextTick(() => {
+    done(null, { id: user._id, username: user.username })
+  })
+})
+
+passport.deserializeUser(async (user, done) => {
+  let result = await db.collection('user').findOne({_id: new ObjectId(user.id)})
+  delete result.password
+  process.nextTick(() => {
+    done(null, result)
+  })
+})
+
 app.get('/login', async (요청, 응답) => {
+  console.log(요청.user)
   응답.render('login.ejs')
 }) 
 
