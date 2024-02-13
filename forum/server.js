@@ -1,14 +1,13 @@
 require('dotenv').config();
 const { PORT, MONGODB_URI } = process.env;
-
 const express = require('express')
 const app = express()
+const { MongoClient, ObjectId } = require('mongodb')
+const methodOverride = require('method-override')
 
+app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
-
-const { MongoClient, ObjectId } = require('mongodb')
-
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
@@ -84,7 +83,7 @@ app.get('/edit/:id', async (요청, 응답) => {
   }
 })
 
-app.post('/edit/:id', async (요청, 응답) => {
+app.put('/edit/:id', async (요청, 응답) => {
   try {
     if (요청.body.title == "" || 요청.body.content == "") {
       응답.send("빈칸이 있습니다.")
