@@ -18,6 +18,7 @@
                             <%= posts[i].title %>
                         </a>
                         <a href="/edit/<%= posts[i]._id %>">✏️</a>
+                        <span class="delete" id="<%= posts[i]._id %>">🗑️</span>
                     </h4>
                     <p>
                         <%= posts[i].content %>
@@ -25,6 +26,17 @@
                 </div>
                 <% } %>
         </div>
+        <script>
+            const buttons = document.querySelectorAll('.delete');
+            for (const button of buttons) {
+                button.addEventListener('click', function (event) {
+                    console.log(event.target.id);
+                    fetch(`list/${event.target.id}`, {
+                        method: 'DELETE'
+                    })
+                })
+            }
+        </script>
 </body>
 
 </html>

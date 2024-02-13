@@ -95,3 +95,11 @@ app.put('/edit/:id', async (요청, 응답) => {
     console.log(e)
   }
 })
+
+app.delete('/list/:id', async (요청, 응답) => {
+  try {
+    await db.collection('post').deleteOne({_id: new ObjectId(요청.params.id)})
+  } catch(e) {
+    console.log(e)
+  }
+})
