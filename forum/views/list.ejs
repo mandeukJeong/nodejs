@@ -32,6 +32,10 @@
                     fetch('/delete?docid=' + e.target.dataset.id, {
                         method: 'DELETE'
                     })
+                        .then((r) => r.text())
+                        .then((r) => {
+                            e.target.parentElement.parentElement.style.display = 'none';
+                        })
                 })
             }
         </script>
