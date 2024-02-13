@@ -29,7 +29,6 @@ app.get('/', (요청, 응답) => {
 
 app.get('/list', async (요청, 응답) => {
     let result = await db.collection('post').find().toArray()
-    console.log(result[0].title) 
     응답.render('list.ejs', {posts: result})
 })
 
@@ -99,4 +98,14 @@ app.put('/edit/:id', async (요청, 응답) => {
 app.delete('/delete', async (요청, 응답) => {
   await db.collection('post').deleteOne({_id: new ObjectId(요청.query.docid)})
   응답.send('삭제완료')
+})
+
+app.get('/list/:id', async (요청, 응답) => {
+  let result = await db.collection('post').find().skip((요청.params.id - 1) * 5).limit(5).toArray()
+  응답.render('list.ejs', {posts: result})
+})
+
+app.get('/list/next/:id', async (요청, 응답) => {
+  let result = await db.collection('post').find({ _id: { $gt: new ObjectId(요청.params.id)}}).limit(5).toArray()
+  응답.render('list.ejs', {posts: result})
 })
