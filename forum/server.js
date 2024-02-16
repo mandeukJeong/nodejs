@@ -4,6 +4,7 @@ const express = require('express')
 const app = express()
 const { MongoClient, ObjectId } = require('mongodb')
 const methodOverride = require('method-override')
+const bcrypt = require('bcrypt')
 
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
@@ -14,13 +15,18 @@ app.use(express.urlencoded({extended: true}))
 const session = require('express-session')
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
+const MongoStore = require('connect-mongo')
 
 app.use(passport.initialize())
 app.use(session({
   secret: '암호화에 쓸 비번',
   resave : false,
   saveUninitialized : false,
-  cookie: { maxAge: 60 * 60 * 1000}
+  cookie: { maxAge: 60 * 60 * 1000},
+  store: MongoStore.create({
+    mongoUrl: MONGODB_URI,
+    dbName: 'forum'
+  })
 }))
 
 app.use(passport.session()) 
@@ -129,7 +135,8 @@ passport.use(new LocalStrategy(async (입력한아이디, 입력한비번, cb) =
   if (!result) {
     return cb(null, false, { message: '아이디 DB에 없음' })
   }
-  if (result.password == 입력한비번) {
+
+  if (await bcrypt.compare(입력한비번, result.password)) {
     return cb(null, result)
   } else {
     return cb(null, false, { message: '비번불일치' });
@@ -167,7 +174,28 @@ app.post('/login', async (요청, 응답, next) => {
 }) 
 
 app.get('/mypage', async (요청, 응답) => {
-  console.log(요청.user)
   if (!요청.user) return 응답.status(401).redirect('/')
   else return 응답.render('mypage.ejs', {user: 요청.user})
+})
+
+app.get('/register', (요청, 응답) => {
+  응답.render('register.ejs')
+})
+
+app.post('/register', async (요청, 응답) => {
+  try {
+    const isDup = await db.collection('user').findOne({username: 요청.body.username})
+    if (isDup) {
+      응답.send("중복된 아이디가 존재합니다.")
+    } else if (요청.body.password != 요청.body.passwordConfirm) {
+      응답.send("두 비밀번호가 일치하지 않습니다.")
+    } else {
+      let hash = await bcrypt.hash(요청.body.password, 10)
+  
+      await db.collection('user').insertOne({username: 요청.body.username, password: hash})
+      응답.redirect('/')
+    }
+  } catch(e) {
+    console.log(e)
+  }
 })
