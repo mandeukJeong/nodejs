@@ -161,7 +161,13 @@ app.post('/login', async (요청, 응답, next) => {
     if (!user) return 응답.status(401).json(info.message)
     요청.logIn(user, (err) => {
       if (err) return next(err)
-      응답.redirect('/')
+      응답.redirect('/mypage')
     })
   })(요청, 응답, next)
 }) 
+
+app.get('/mypage', async (요청, 응답) => {
+  console.log(요청.user)
+  if (!요청.user) return 응답.status(401).redirect('/')
+  else return 응답.render('mypage.ejs', {user: 요청.user})
+})
