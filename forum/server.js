@@ -50,16 +50,31 @@ function checkLogin(요청, 응답, next) {
   next()
 }
 
+function printTime(request, response, next) {
+  console.log(new Date())
+  next()
+}
+
+function checkEmpty(request, response, next) {
+  if (request.body.username == "" || request.body.password == "") {
+    response.send('그러지마세요')
+  } else {
+    next()
+  }
+}
+
+app.use('/list', printTime)
+
 app.get('/', (요청, 응답) => {
     응답.sendFile(__dirname + '/index.html')
 })
 
-app.get('/list', checkLogin, async (요청, 응답) => {
+app.get('/list', async (요청, 응답) => {
     let result = await db.collection('post').find().toArray()
     응답.render('list.ejs', {posts: result})
 })
 
-app.get('/time', async (요청, 응답) => {
+app.get('/time', checkLogin, async (요청, 응답) => {
     응답.render('time.ejs', {time: new Date()})
 })
 
@@ -169,7 +184,7 @@ app.get('/login', async (요청, 응답) => {
   응답.render('login.ejs')
 }) 
 
-app.post('/login', async (요청, 응답, next) => {
+app.post('/login', checkEmpty,  async (요청, 응답, next) => {
   passport.authenticate('local', (error, user, info) => {
     if (error) return 응답.status(500).json(error)
     if (!user) return 응답.status(401).json(info.message)
@@ -189,7 +204,7 @@ app.get('/register', (요청, 응답) => {
   응답.render('register.ejs')
 })
 
-app.post('/register', async (요청, 응답) => {
+app.post('/register',checkEmpty, async (요청, 응답) => {
   try {
     const isDup = await db.collection('user').findOne({username: 요청.body.username})
     if (isDup) {
