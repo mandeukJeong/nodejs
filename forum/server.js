@@ -245,3 +245,8 @@ app.post('/register',checkEmpty, async (요청, 응답) => {
 
 app.use('/shop', require('./routes/shop.js'))
 app.use('/board', [checkLogin, require('./routes/board.js')])
+
+app.get('/search', async (요청, 응답) => {
+  let result = await db.collection('post').find({title: { $regex: 요청.query.val}}).toArray()
+  응답.render('search.ejs', {posts: result})
+})
