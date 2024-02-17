@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { PORT, MONGODB_URI } = process.env;
+const { PORT, MONGODB_URI, S3_KEY, S3_SECRET } = process.env;
 const express = require('express')
 const app = express()
 const { MongoClient, ObjectId } = require('mongodb')
@@ -30,6 +30,27 @@ app.use(session({
 }))
 
 app.use(passport.session()) 
+
+const { S3Client } = require('@aws-sdk/client-s3')
+const multer = require('multer')
+const multerS3 = require('multer-s3')
+const s3 = new S3Client({
+  region : 'ap-northeast-2',
+  credentials : {
+      accessKeyId : S3_KEY,
+      secretAccessKey : S3_SECRET
+  }
+})
+
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'minseoforum',
+    key: function (요청, file, cb) {
+      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+    }
+  })
+})
 
 let db;
 const url = MONGODB_URI
@@ -82,13 +103,12 @@ app.get('/write', async (요청, 응답) => {
   응답.render('write.ejs')
 })
 
-app.post('/add', async (요청, 응답) => {
-  console.log(요청.body)
+app.post('/add', upload.single('img1'), async (요청, 응답) => {
   try {
     if (요청.body.title == "") {
       응답.send('제목 입력 안했는데')
     } else {
-      await db.collection('post').insertOne({title: 요청.body.title, content: 요청.body.content})
+      await db.collection('post').insertOne({title: 요청.body.title, content: 요청.body.content, img: 요청.file.location})
       응답.redirect('/list')
     }
   } catch(e) {
