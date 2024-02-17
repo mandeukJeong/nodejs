@@ -244,3 +244,4 @@ app.post('/register',checkEmpty, async (요청, 응답) => {
 })
 
 app.use('/shop', require('./routes/shop.js'))
+app.use('/board', [checkLogin, require('./routes/board.js')])
