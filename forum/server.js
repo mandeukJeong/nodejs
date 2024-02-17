@@ -52,9 +52,10 @@ const upload = multer({
   })
 })
 
+let connectDB = require('./database.js')
+
 let db;
-const url = MONGODB_URI
-new MongoClient(url).connect().then((client)=>{
+connectDB.then((client)=>{
   console.log('DB연결성공')
   db = client.db('forum')
   app.listen(PORT, () => {
@@ -241,3 +242,5 @@ app.post('/register',checkEmpty, async (요청, 응답) => {
     console.log(e)
   }
 })
+
+app.use('/shop', require('./routes/shop.js'))
