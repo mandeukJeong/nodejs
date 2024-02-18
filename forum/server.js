@@ -92,8 +92,8 @@ app.get('/', (요청, 응답) => {
 })
 
 app.get('/list', async (요청, 응답) => {
-    let result = await db.collection('post').find().toArray()
-    응답.render('list.ejs', {posts: result})
+  let result = await db.collection('post').find().toArray()
+  응답.render('list.ejs', {posts: result, user: 요청.user})
 })
 
 app.get('/time', checkLogin, async (요청, 응답) => {
@@ -150,7 +150,7 @@ app.put('/edit/:id', async (요청, 응답) => {
     if (요청.body.title == "" || 요청.body.content == "") {
       응답.send("빈칸이 있습니다.")
     } else {
-      await db.collection('post').updateOne({_id: new ObjectId(요청.params.id)}, {$set: {title: 요청.body.title, content: 요청.body.content}})
+      await db.collection('post').updateOne({_id: new ObjectId(요청.params.id), user: new ObjectId(요청.user._id)}, {$set: {title: 요청.body.title, content: 요청.body.content}})
       응답.redirect('/list')
     }
   } catch(e) {

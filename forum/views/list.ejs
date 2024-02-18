@@ -25,10 +25,12 @@
                 <div class="list-box">
                     <h4>
                         <a href="/detail/<%= posts[i]._id %>">
-                            <%= posts[i ].title %>
+                            <%= posts[i].title %>
                         </a>
                         <a href="/edit/<%= posts[i]._id %>">✏️</a>
-                        <span class="delete" data-id="<%= posts[i]._id %>">🗑️</span>
+                        <% if (String(user._id)==String(posts[i].user)) { %>
+                            <span class="delete" data-id="<%= posts[i]._id %>">🗑️</span>
+                            <% } %>
                     </h4>
                     <p>
                         <%= posts[i].content %>
