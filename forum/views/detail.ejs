@@ -20,6 +20,19 @@
             <% if (data.img) { %>
                 <img src="<%= data.img %>">
                 <%} %>
+                    <hr style="margin-top: 60px">
+                    <div>
+                        <p><strong>
+                                <%= comment[0].writer %>
+                            </strong>
+                            <%= comment[0].content %>
+                        </p>
+                    </div>
+                    <form action="/comment" method="POST">
+                        <input name="content">
+                        <input name="parentId" value="<%= data._id %>" style="display: none;">
+                        <button type="submit">댓글작성</button>
+                    </form>
         </div>
 </body>
 

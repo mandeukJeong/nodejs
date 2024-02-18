@@ -120,11 +120,12 @@ app.post('/add', upload.single('img1'), async (요청, 응답) => {
 
 app.get('/detail/:id', async (요청, 응답) => {
   try {
+    let comment = await db.collection('comment').find({parentId: new ObjectId(요청.params.id)}).toArray()
     let result = await db.collection('post').findOne({_id: new ObjectId(요청.params.id)})
     if (result == null) {
       응답.status(404).send('게시물이 존재하지 않음')
     } else {
-      응답.render('detail.ejs', {data: result})
+      응답.render('detail.ejs', {data: result, comment: comment})
     }
   } catch (e) {
     console.log(e)
@@ -261,4 +262,14 @@ app.get('/search', async (요청, 응답) => {
 
   let result = await db.collection('post').aggregate(searchCondition).toArray()
   응답.render('search.ejs', {posts: result})
+})
+
+app.post('/comment', async (요청, 응답) => {
+  await db.collection('comment').insertOne({
+    content: 요청.body.content,
+    writeId: new ObjectId(요청.user.id),
+    writer: 요청.user.username,
+    parentId: new ObjectId(요청.body.parentId)
+  })
+  응답.redirect('back') 
 })
