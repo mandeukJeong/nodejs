@@ -247,6 +247,15 @@ app.use('/shop', require('./routes/shop.js'))
 app.use('/board', [checkLogin, require('./routes/board.js')])
 
 app.get('/search', async (요청, 응답) => {
-  let result = await db.collection('post').find({$text: {$search: 요청.query.val}}).toArray()
+  let searchCondition = [
+    {
+      $search: {
+        index: 'title_index',
+        text: { query: 요청.query.val, path: 'title'}
+      }
+    }
+  ]
+
+  let result = await db.collection('post').aggregate(searchCondition).toArray()
   응답.render('search.ejs', {posts: result})
 })
