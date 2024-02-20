@@ -273,3 +273,25 @@ app.post('/comment', async (요청, 응답) => {
   })
   응답.redirect('back') 
 })
+
+app.get('/chat/request', async (요청, 응답) => {
+  await db.collection('chatroom').insertOne({
+    member: [요청.user._id, new ObjectId(요청.query.writerId)],
+    date: new Date()
+  })
+  응답.redirect('/chat/list')
+})
+
+app.get('/chat/list', async (요청, 응답) => {
+  let result = await db.collection('chatroom').find({
+    member: 요청.user._id
+  }).toArray()
+  응답.render('chatList.ejs', {result: result})
+})
+
+app.get('/chat/detail/:id', async (요청, 응답) => {
+  let result = await db.collection('chatroom').findOne({
+    _id: new ObjectId(요청.params.id)
+  })
+  응답.render('chatDetail.ejs', {result: result})
+})
