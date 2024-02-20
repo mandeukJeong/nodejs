@@ -28,9 +28,6 @@
                             <%= posts[i].title %>
                         </a>
                         <a href="/edit/<%= posts[i]._id %>">✏️</a>
-                        <% if (user && String(user._id)==String(posts[i].user)) { %>
-                            <span class="delete" data-id="<%= posts[i]._id %>">🗑️</span>
-                            <% } %>
                     </h4>
                     <p>
                         <%= posts[i].content %>
@@ -41,23 +38,11 @@
         <a href="/list/next/<%= posts[posts.length - 1]._id %>">다음</a>
 
         <script>
-            for (let i = 0; i < '<%= posts.length %>'; i++) {
-                document.querySelectorAll('.delete')[i].addEventListener('click', function (e) {
-                    fetch('/delete?docid=' + e.target.dataset.id, {
-                        method: 'DELETE'
-                    })
-                        .then((r) => r.text())
-                        .then((r) => {
-                            e.target.parentElement.parentElement.style.display = 'none';
-                        })
-                })
-            }
-        </script>
-
-        <script>
             let eventSource = new EventSource('/stream/list')
             eventSource.addEventListener('msg', function (e) {
                 console.log(e.data)
+                let changeJson = JSON.parse(e.data)
+                document.querySelector('.white-bg').insertAdjacentHTML('afterbegin', `<div class="list-box"><h4>${changeJson.title}</h4></div>`)
             })
         </script>
 </body>

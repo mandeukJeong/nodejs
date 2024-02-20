@@ -60,9 +60,15 @@ const upload = multer({
 let connectDB = require('./database.js')
 
 let db;
+let changeStream;
 connectDB.then((client)=>{
   console.log('DB연결성공')
   db = client.db('forum')
+  let condition = [
+    { $match: { operationType: 'insert' } }
+  ]
+
+  changeStream = db.collection('post').watch(condition)
   server.listen(PORT, () => {
     console.log('http://localhost:8080 에서 서버 실행중')
 })
@@ -318,8 +324,8 @@ app.get('/stream/list', (요청, 응답) => {
     "Cache-Control": "no-cache",
   });
 
-  setInterval(() => {
-    응답.write('event: msg\n');
-    응답.write('data: 바보\n\n');
-  }, 1000 )
+  changeStream.on('change', (result) => {
+    응답.write('event: msg\n')
+    응답.write(`data: ${JSON.stringify(result.fullDocument)}\n\n`)
+  })
 })
