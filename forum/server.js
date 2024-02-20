@@ -6,6 +6,11 @@ const { MongoClient, ObjectId } = require('mongodb')
 const methodOverride = require('method-override')
 const bcrypt = require('bcrypt')
 
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const server = createServer(app)
+const io = new Server(server) 
+
 app.use(methodOverride('_method'))
 app.use(express.static(__dirname + '/public'))
 app.set('view engine', 'ejs')
@@ -58,7 +63,7 @@ let db;
 connectDB.then((client)=>{
   console.log('DB연결성공')
   db = client.db('forum')
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log('http://localhost:8080 에서 서버 실행중')
 })
 }).catch((err)=>{
@@ -294,4 +299,18 @@ app.get('/chat/detail/:id', async (요청, 응답) => {
     _id: new ObjectId(요청.params.id)
   })
   응답.render('chatDetail.ejs', {result: result})
+})
+
+io.on('connection', (socket) => {
+  socket.on('age', (data) => {
+    io.emit('name','minseo')
+  })
+
+  socket.on('ask-join', (data) => {
+    socket.join(data)
+  })
+
+  socket.on('message', (data) => {
+    io.to(data.room).emit('broadcast', data.msg)
+  })
 })
