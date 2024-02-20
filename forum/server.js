@@ -302,10 +302,6 @@ app.get('/chat/detail/:id', async (요청, 응답) => {
 })
 
 io.on('connection', (socket) => {
-  socket.on('age', (data) => {
-    io.emit('name','minseo')
-  })
-
   socket.on('ask-join', (data) => {
     socket.join(data)
   })
